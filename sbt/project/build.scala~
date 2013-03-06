@@ -1,0 +1,46 @@
+/*import sbt._
+import Keys._
+
+object BuildSettings {
+	val buildOrganization = "edu.berkeley.cs"
+	val buildVersion = "1.1"
+	val buildScalaVersion = "2.9.2"
+	def apply(projectdir: String) = {
+			Defaults.defaultSettings ++ Seq (
+			organization := buildOrganization,
+			version := buildVersion,
+			scalaVersion := buildScalaVersion,
+			scalaSource in Compile := Path.absolute(file(projectdir + "/src")),
+			libraryDependencies += "edu.berkeley.cs" %% "chisel" % "1.0"
+		)
+	}
+}
+object ChiselBuild extends Build {
+	import BuildSettings._
+	lazy val chisel = Project("chisel", file("chisel"), settings = BuildSettings(".."))
+	lazy val gpu = Project("gpu", file("gpu"), settings = BuildSettings("..")) dependsOn(chisel)
+}
+*/
+
+import sbt._
+import Keys._
+
+object BuildSettings {
+   val buildOrganization = "berkeley"
+   val buildVersion = "1.1"
+   val buildScalaVersion = "2.9.2"
+
+   val buildSettings = Defaults.defaultSettings ++ Seq (
+      organization := buildOrganization,
+      version      := buildVersion,
+      scalaVersion := buildScalaVersion//,
+      //scalaSource in Compile := Path.absolute(file("../src"))
+   )
+}
+
+object ChiselBuild extends Build{
+   import BuildSettings._
+   lazy val chisel = Project("chisel", file("chisel"), settings = buildSettings)
+   lazy val gpu = Project("gpu", file("gpu"), settings = buildSettings ++ Seq(scalaSource in Compile := Path.absolute(file("../src")))) dependsOn(chisel)
+}
+
