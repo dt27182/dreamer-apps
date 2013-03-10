@@ -1,0 +1,76 @@
+package Dreamer_Apps
+import Chisel._
+import Node._
+import scala.collection.mutable.HashMap
+import util.Random
+
+class Sort_Node(w: Int) extends Component {
+	val io = new Bundle {
+		val m = UFix(width = w, dir = INPUT)
+		val x = UFix(width = w, dir = INPUT)
+		val max = UFix(width = w, dir = OUTPUT)
+		val min = UFix(width = w, dir = OUTPUT)
+	}
+	io.max := io.x
+	when(io.m > io.x){
+		io.max := io.m
+	}
+	io.min := io.x
+	when(io.m < io.x){
+		io.min := io.m
+	}
+}
+
+class Sort(w: Int, n: Int) extends Component {
+	val io = new Bundle {
+		val vec_in = Vec(n) {UFix(width = w, dir = INPUT)}
+		val vec_out = Vec(n) {UFix(width = w, dir = OUTPUT)}
+	}
+	val sort_nodes = new Array[Array[Sort_Node]](n)
+	for(i <- 0 until n) {
+		sort_nodes(i) = new Array[Sort_Node](n)
+		for(j <- 0 until (i + 1)) {
+			sort_nodes(i)(j) = new Sort_Node(w)
+		}
+	}
+	for(i <- 0 until n) {
+		for(j <- 0 until (i + 1)) {
+			if (j == i){
+				sort_nodes(i)(j).io.m := UFix(0)
+			} else {
+				sort_nodes(i)(j).io.m := sort_nodes(i-1)(j).io.max
+			}
+			if (j == 0) {
+				sort_nodes(i)(j).io.x := io.vec_in(i)
+			} else {
+				sort_nodes(i)(j).io.x := sort_nodes(i)(j-1).io.min
+			}
+			if (i == n-1) {
+				io.vec_out(j) := sort_nodes(i)(j).io.max
+			}
+		}
+	}
+}
+
+class SortTests(c: Sort, w: Int, n: Int) extends Tester(c, Array(c.io)) {
+	defTests{
+		var success = true
+		val vars = new HashMap[Node, Node] ()
+		val randGenerator = new Random()
+		for ( t <- 0 until 16){
+			val testVector = new Array[Int](n)
+			val vec_in = Vec(n){UFix(width = w)}
+			val vec_out = Vec(n){UFix(width = w)}
+			for (i <- 0 until n){
+				testVector(i) = randGenerator.nextInt(16)
+				vars(c.io.vec_in(i)) = UFix(testVector(i))
+			}
+			val sortedTestVector = testVector.sortWith(_ > _)
+			for (i <- 0 until n){
+				vars(c.io.vec_out(i) = UFix(sortedTestVector(i))
+			}
+			success = step(vars) && success
+		}
+		success
+	}
+}
