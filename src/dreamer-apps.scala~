@@ -1,14 +1,23 @@
 package Dreamer_Apps
 
 import Chisel._
-
 object Dreamer_Apps {
 	def main(args: Array[String]): Unit = {
-		chiselMainTest(args, () => new MatVecMul(2)){
-			c => new MatVecMulTests(c,32,2)
+		chiselMainTest(args, () => new FFT(4)){
+			c => new MatVecMulTests(c,32,16)
+		}
+		//chiselMain(args, () => new FFT(4))
+	}
+}
+/*
+object Dreamer_Apps {
+	def main(args: Array[String]): Unit = {
+		chiselMainTest(args, () => new MatVecMul(16)){
+			c => new MatVecMulTests(c,32,16)
 		}
 	}
 }
+*/
 /*
 object Dreamer_Apps {
 	def main(args: Array[String]): Unit = {

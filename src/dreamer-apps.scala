@@ -1,7 +1,15 @@
 package Dreamer_Apps
 
 import Chisel._
-
+object Dreamer_Apps {
+	def main(args: Array[String]): Unit = {
+		chiselMainTest(args, () => new FFT(4)){
+			c => new FFTTests(c,4)
+		}
+		//chiselMain(args, () => new FFT(4))
+	}
+}
+/*
 object Dreamer_Apps {
 	def main(args: Array[String]): Unit = {
 		chiselMainTest(args, () => new MatVecMul(16)){
@@ -9,6 +17,7 @@ object Dreamer_Apps {
 		}
 	}
 }
+*/
 /*
 object Dreamer_Apps {
 	def main(args: Array[String]): Unit = {
